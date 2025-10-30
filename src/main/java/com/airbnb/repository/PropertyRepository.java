@@ -3,6 +3,8 @@ package com.airbnb.repository;
 import com.airbnb.entity.City;
 import com.airbnb.entity.Country;
 import com.airbnb.entity.Property;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -52,13 +54,48 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
 //@Query("SELECT p FROM Property p INNER JOIN p.city c ON c.name = :name INNER JOIN p.country co ON co.name = :name")
     // OR SEE below query both are same
-@Query("select p from Property p JOIN p.city c JOIN p.country co where c.name=:name or co.name =:name")
-    List<Property> searchProperty(
-//            @Param("cityName") String cityName
-            @Param("name") String name
+//@Query("select p from Property p JOIN p.city c JOIN p.country co where c.name=:name or co.name =:name")
+//    List<Property> searchProperty(
+////            @Param("cityName") String cityName
+//            @Param("name") String name
+//    );
+
+// Above is without pagination and below one is with pagination
+
+                                   //   pagination
+
+    // 1. For simple city/country search
+    @Query("SELECT p FROM Property p JOIN p.city c JOIN p.country co WHERE c.name = :name OR co.name = :name")
+    Page<Property> searchProperty(
+            @Param("name") String name, Pageable pageable);
+
+           // New method for search with price range
+
+    // 2. For price range search
+    @Query("SELECT DISTINCT p FROM Property p JOIN p.rooms r " +
+            "WHERE (LOWER(p.city.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
+            "OR LOWER(p.country.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+            "AND r.price BETWEEN :minPrice AND :maxPrice")
+    Page<Property> searchPropertyWithPrice(
+            @Param("name") String name,
+            @Param("minPrice") Double minPrice,
+            @Param("maxPrice") Double maxPrice,
+            Pageable pageable
     );
 
-// below code for finding duplicate of property
+    //  Finds the **lowest room price** for properties in a given city or country
+    @Query("SELECT MIN(r.price) FROM Property p JOIN p.rooms r " +
+            "WHERE LOWER(p.city.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
+            "OR LOWER(p.country.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    Double findMinRoomPrice(@Param("name") String name);
+
+    //  Finds the **highest room price** for properties in a given city or country
+    @Query("SELECT MAX(r.price) FROM Property p JOIN p.rooms r " +
+            "WHERE LOWER(p.city.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
+            "OR LOWER(p.country.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    Double findMaxRoomPrice(@Param("name") String name);
+
+    // below code for finding duplicate of property
     @Query("SELECT p FROM Property p WHERE p.name = :propertyName AND p.city.id = :cityId AND p.country.id = :countryId")
     Optional<Property> findByPropertyNameAndCityIdAndCountryId(
             @Param("propertyName") String propertyName,
@@ -91,6 +128,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     // so just by writing INNER JOIN p.city --> directly join happens and then call that
     // table c --> p.city  c --> so joining between --> Property p and c  and then put a
     // condition
+
 
 }
 
@@ -130,6 +168,15 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
 
 // detail of this is in --> Lecture 24 --> page 63 --> JAVA-Pankaj-Sir-Feb-2
+
+
+
+
+
+
+
+
+
 
 
 

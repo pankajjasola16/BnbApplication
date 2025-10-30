@@ -72,7 +72,9 @@ public class JWTFilter extends OncePerRequestFilter {
 //        System.out.println(token);
         // in this token --> the word --> Bearer is coming --> so remove that
         if (token!=null && token.startsWith("Bearer")){
-            String tokenVal = token.substring(8, token.length()-1);
+//            String tokenVal = token.substring(8, token.length()-1);
+            String tokenVal = token.substring(7);
+
             String username = jwtService.getUserName(tokenVal);
 //            System.out.println(username);
 //            System.out.println(tokenVal);
@@ -179,3 +181,4 @@ public class JWTFilter extends OncePerRequestFilter {
 //        like Collections.singleton() for configuring user roles.
     }
 }
+

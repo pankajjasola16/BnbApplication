@@ -74,6 +74,9 @@ public class JWTService {
                 withClaim(USER_NAME,user.getUsername())
                 // Above will embed the username into the token for later verification or retrieval.
 //                .withExpiresAt(new Date(System.currentTimeMillis()))
+                .withClaim("role", user.getRole())         // 👈 add role claim here
+                .withClaim("name", user.getName())           //  full name to show who have logged in
+                .withClaim("email", user.getEmail())         //  email
                 .withExpiresAt(expirationDate)
                 .withIssuer(issuer)
                 .sign(algorithm);
@@ -136,3 +139,4 @@ public class JWTService {
 //withExpiresAt(expirationDate): Sets the token's expiration time to the provided expirationDate.
 //withIssuer(issuer): Specifies the issuer of the token for validation purposes.
 //sign(algorithm): Signs the token using the specified cryptographic algorithm (e.g., HMAC256) for security.
+

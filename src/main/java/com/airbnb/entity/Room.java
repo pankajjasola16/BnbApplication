@@ -29,8 +29,14 @@ public class Room {
     @JoinColumn(name = "property_id")
     private Property property;
 
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
+//    @Column(name = "date", nullable = false)
+//    private LocalDate date;
+
+    @Column(name = "start_date", nullable = true)
+    private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = true)
+    private LocalDate endDate;
 
     @Version
     private long version;
@@ -49,6 +55,13 @@ public class Room {
 // we can also keep the --> type in another table by doing Normalization
 
 }
+
+
+
+
+
+
+
 
 
 

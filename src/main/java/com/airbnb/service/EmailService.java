@@ -28,6 +28,7 @@ public class EmailService {
         // Use MimeMessageHelper for handling attachments
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
+        helper.setFrom("pankajjasola16@gmail.com");
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(text);
@@ -64,3 +65,4 @@ public class EmailService {
 //        The email may be sent successfully, but the PDF attachment will be either missing or corrupted.
 //        By calling document.open();, the program ensures that the document is ready to accept
 //        content and that a proper PDF file is generated.
+

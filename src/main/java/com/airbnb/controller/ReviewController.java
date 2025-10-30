@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,8 +56,8 @@ public class ReviewController {
         // supply JWT Token to the URL --> this Annotation gets the --> user deatils and telling
         // this is the current user logged in --> this is how we track --> which user is logged in
         // if we will not track --> which user is logged in --> we will not be able to give the
-        // relevant user data --> which means --> when i login you should give me only my review Details
-        // that is possible only --> when i am able to track the current user logged in data
+        // relevant user data --> which means --> when I login you should give me only my review Details
+        // that is possible only --> when I am able to track the current user logged in data
 
 //        System.out.println(user.getName());  // Output --> mike
 //        System.out.println(user.getEmail()); // Output --> mike@gmail.com
@@ -69,9 +70,15 @@ public class ReviewController {
                 ()-> new ResourceNotFoundException("property with this id :"+propertyId+" does not exist")
         );
         // below we are supplying directly object not userId and propertyId
-        Review reviewDetails = reviewRepository.findByUserAndProperty(user, property);
-        if (reviewDetails!=null){
-            return new ResponseEntity<>("Review Exists", HttpStatus.CREATED);
+//        Review reviewDetails = reviewRepository.findByUserAndProperty(user, property);
+//        if (reviewDetails!=null){
+//            return new ResponseEntity<>("Review Exists", HttpStatus.CREATED);
+//        }
+
+        // prevent duplicate review by same user on same property
+        Review existingReview = reviewRepository.findByUserAndProperty(user, property);
+        if (existingReview != null) {
+            return new ResponseEntity<>("Review already exists for this property", HttpStatus.BAD_REQUEST);
         }
         // below we will set the user id and proprty id in review table which is foriegn key
         review.setAppUser(user);
@@ -120,4 +127,44 @@ public class ReviewController {
         return reviews;
         // make return as response entity
     }
+
+    //  front end will call this api for average rating
+    // http://localhost:8080/api/v1/reviews/rate?propertyId=${propertyId}
+    @PostMapping("/rate")
+    public ResponseEntity<?> rateProperty(
+            @RequestParam long propertyId,
+            @RequestBody Review review,
+            @AuthenticationPrincipal AppUser user
+    ) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + propertyId));
+
+        // Check if this user already rated this property
+        Review existingReview = reviewRepository.findByUserAndProperty(user, property);
+
+        if (existingReview != null) {
+            // update the rating
+            existingReview.setRating(review.getRating());
+            existingReview.setDescription(review.getDescription());
+            reviewRepository.save(existingReview);
+        } else {
+            // create a new rating
+            review.setAppUser(user);
+            review.setProperty(property);
+            reviewRepository.save(review);
+        }
+
+        // Just calculate and return (do NOT persist in Property)
+        Double avgRating = reviewRepository.calculateAverageRating(propertyId);
+        if (avgRating == null) avgRating = 0.0;
+
+        return ResponseEntity.ok().body(Map.of(
+                "averageRating", avgRating,  //
+                "userRating", review.getRating(),  // this will show the user rating on the front end
+                "message", "Rating submitted successfully!"
+        ));
+    }
+
+
 }
+

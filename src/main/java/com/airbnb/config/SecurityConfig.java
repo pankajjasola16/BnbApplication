@@ -2,6 +2,7 @@ package com.airbnb.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,7 +60,7 @@ public class SecurityConfig {
         // now do the first Configuration
 
         // Below this line of code which earlier was restricting me(giving 403 error forbidden)
-        // to fire a request from third party software --. this helps me stop that
+        // to fire a request from third party software --. thisā helps me stop that
         // below we are disabling csrf() --> so that any third party software can access the URL
 
         // h(cd)2   --> formula
@@ -128,15 +129,75 @@ public class SecurityConfig {
 //                .requestMatchers("/api/v1/booking/createBooking").permitAll()
 
                 // below we have given permission for AuthController
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/auth/createuser").permitAll()
+                .requestMatchers("/api/v1/auth/login").permitAll()
                 // below we have given permission for PropertyController
                 .requestMatchers("/api/v1/property/propertyresult").permitAll()
+                // anyone can rate
+                .requestMatchers("/api/v1/reviews/rate").permitAll()
                 .requestMatchers("/api/v1/otp/**").permitAll()  // 👈 allow OTP endpoints
                 // below one --> only owner can add property
                 .requestMatchers("/api/v1/property/addProperty").hasAnyRole("OWNER","ADMIN","MANAGER")
 //                .requestMatchers("/api/v1/auth/createpropertymanager").hasRole("ADMIN")
                 .requestMatchers("/api/v1/images/**").hasAnyRole("OWNER","ADMIN","MANAGER")
+                // only below roles can add country
+                .requestMatchers("/api/v1/country/addCountry").hasAnyRole("OWNER","ADMIN", "MANAGER")
+                .requestMatchers("/rooms/**").permitAll()
+                .requestMatchers("/api/v1/booking/checkAvailabilityAndCreatePayment").permitAll()
+                .requestMatchers("/addRoom").hasAnyRole("OWNER","ADMIN", "MANAGER")
+                .requestMatchers("/api/v1/auth/createpropertymanager").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/property/deleteProperty").hasAnyRole("OWNER", "ADMIN")
+
+
+                // permission for swagger below
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+
+                // permit all access to static files like add-countrey.html, CSS, JS, etc.
+//                .requestMatchers("/", "/add-country.html", "/css/**", "/js/**", "/images/**").permitAll()
+                // permit all add-city, add-country, add-property in one line to open html pages only not for roles
+                .requestMatchers(
+                        "/",
+                        "/add-country.html",
+                        "/add-city.html",
+                        "/add-property.html",
+                        "/your-added-property.html",
+                        "/booking.html",
+                        "/booking-confirmation.html",
+                        "/search-results.html",
+                        "/all-properties.html",
+                        "/Hotel-dashboard.html",
+                        "/Login.html",
+                        "/signup.html",
+                        "/add-room.html",
+                        "/payment.html",
+                        "/otp-login.html",
+                        "/create-manager.html",
+                        "/my-bookings.html",
+                        "/jobportal.html",
+                        "/booking.js",
+                        "/booking-confirmation.js",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/favicon.ico"
+                ).permitAll()
+
+
+
                 .anyRequest().authenticated();
+
+//   above all will not check roles untill you mention like --> hasAnyRole("OWNER","ADMIN", "MANAGER")
+
+//        If you want to allow all HTML files inside static folder without listing every single file, you could do:
+
+//                .requestMatchers("/**/*.html", "/css/**", "/js/**", "/images/**").permitAll()
+
+//        This permits all .html files under your static folder.
 
         // Above .anyRequest().authenticated(); --> any request apart from  --> "/api/v1/auth/**"
         // will work only when we send the request with --> JWT Token
@@ -206,4 +267,6 @@ public class SecurityConfig {
 // authentication, authorization, filters, and other security-related settings.
 // Spring Security uses this chain to process incoming HTTP requests and enforce the configured security
 // rules.
+
+
 

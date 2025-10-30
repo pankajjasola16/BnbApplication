@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 @SpringBootApplication
 public class BnbApplication {
 
@@ -35,3 +36,10 @@ public class BnbApplication {
 // in Spring security i am using passwordEncoder with @Autowired for that the object will
 // not be created --> so now which object to create --> i have to configure that -> and
 // i will do that by using --> @Bean Annotation in my configuration class
+
+                          // Documentation by Swagger
+
+//     http://localhost:8080/swagger-ui.html
+//     OR for more Modern Path:
+//     http://localhost:8080/swagger-ui/index.html
+

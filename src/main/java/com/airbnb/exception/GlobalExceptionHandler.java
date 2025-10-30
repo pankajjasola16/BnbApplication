@@ -41,6 +41,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    //  Add this below the generic handler - to get the phone number is 10 digit or not
+    @ExceptionHandler(UserExists.class)
+    public ResponseEntity<ErrorDetails> handleUserExistsException(
+            UserExists ex,
+            WebRequest request
+    ) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                new Date(),
+                ex.getMessage(),  // this will be "Email id Exists" or "Phone already exists" depending on what you throw
+                request.getDescription(true)
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
@@ -62,3 +76,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 }
 // @ExceptionHandler(ResourceNotFoundException.class) --> It means handle all the
 // exception related to this class (ResourceNotFoundException.class)
+

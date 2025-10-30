@@ -33,6 +33,8 @@ public class Property {
     @Column(name = "number_of_bedrooms", nullable = false)
     private Integer numberOfBedrooms;
 
+
+
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
@@ -102,6 +104,37 @@ public class Property {
         images.remove(image);
         image.setProperty(null);
     }
+
+    // This field is not saved to the database.  Below
+    //It will be used just to send the cheapest room price with each property.
+
+    @Transient
+    private Double minRoomPrice;
+
+    public Double getMinRoomPrice() {
+        return minRoomPrice;
+    }
+
+    public void setMinRoomPrice(Double minRoomPrice) {
+        this.minRoomPrice = minRoomPrice;
+    }
+
+    @Transient
+    private Double rating; // average rating
+
+    @Transient
+    private Double userRating; // current logged-in user's rating (optional)
+
+    public Double getRating() { return rating; }
+    public void setRating(Double rating) { this.rating = rating; }
+
+    public Double getUserRating() { return userRating; }
+    public void setUserRating(Double userRating) { this.userRating = userRating; }
+
+//    @Transient → not persisted in DB, just sent to frontend.
+//
+//    You can calculate and set rating in PropertyController when you fetch the properties.
+
 }
 
 // Parent table  It does not have the foreign key

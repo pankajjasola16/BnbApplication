@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+// this field is for sending the booking confirmation when the user booked the property
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,4 +25,6 @@ public class BookingResponseDTO {
 
     // Getters and Setters (or use Lombok's @Data for brevity)
 }
+
+
 

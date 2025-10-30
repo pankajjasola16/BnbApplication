@@ -47,15 +47,15 @@ public class AuthController {
     // i can create property manager Signup Detail
 
     // http://localhost:8080/api/v1/auth
-    // this URL is secured because of Spring Security but we have opened it in
+    // this URL is secured because of Spring Security, but we have opened it in
     //  SecurityConfig.java by using @Bean
-    // below URL should signup as a --> user Role --> so after adding a role field in AppUser.java
-    // change the below URL --> now befor going to createUser() methodset the --> Role --> as
+    // below URL should Sign Up as a --> user Role --> so after adding a role field in AppUser.java
+    // change the below URL --> now before going to createUser() method set the --> Role --> as
     // we set the password --> so set Role before creating user because anybody who signup
-    // theu do not know what is their Role
+    // they do not know what is their Role
     // http://localhost:8080/api/v1/auth/createuser
-    // whoever will signup he will be called --> user --> so he can only search hotel & book hotel
-    // and he can only login as a --> user
+    // whoever will sign up he will be called --> user --> so he can only search hotel & book hotel
+    // And he can Log in only as a --> user
     @PostMapping("/createuser")
     public ResponseEntity<AppUser> createUser(
             @RequestBody AppUser user
@@ -80,6 +80,8 @@ public class AuthController {
         // for learning see class --> A --> how to encrypt password
         // whoever will signup he will be called --> user
         user.setRole("ROLE_USER");
+              // if we want to set the role from the JSON below
+//        user.setRole("ROLE_" + user.getRole().toUpperCase());
         AppUser savedUser = appUserService.createUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
@@ -123,6 +125,7 @@ public class AuthController {
     // and this Collection should have what object --.>So this Collection should have an object
     // of the Type --> new SimpleGrantedAuthority()
 
+    // http://localhost:8080/api/v1/auth/createpropertymanager
     @PostMapping("/createpropertymanager")
     public ResponseEntity<AppUser> createPropertyManager(
             @RequestBody AppUser user
@@ -163,6 +166,10 @@ public class AuthController {
 
     }
 }
+
+
+
+
 
 
 

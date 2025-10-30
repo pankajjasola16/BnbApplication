@@ -3,6 +3,7 @@ package com.airbnb.entity;
 import com.airbnb.validation.FutureOrToday;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,9 +22,14 @@ public class Booking {
     @Column(name = "no_of_guests")
     private Integer noOfGuests;
 
+    @Pattern(
+            regexp = "^(?!\\d+$)[A-Za-z ]+$",
+            message = "Guest name must contain only letters and cannot be only numbers."
+    )
     @Column(name = "guest_name", nullable = false)
     private String guestName;
 
+    @Pattern(regexp = "^[0-9]{10}$", message = "Mobile number must be exactly 10 digits.")
     @Column(name = "mobile", nullable = false, length = 10)
     private String mobile;
 
@@ -47,6 +53,9 @@ public class Booking {
     @Column(name = "total_nights", nullable = false)
     private Integer totalNights;
 
+    @Column(name = "status", nullable = false)
+    private String status; // ACTIVE, CANCELED, COMPLETED
+
     // checkIn Date -->minus 1 room count:
 
                         //   Custom Annotation
@@ -66,6 +75,18 @@ public class Booking {
     @Column(name = "check_out_date", nullable = false)
     private LocalDate checkOutDate;
 
+                            //    payment gateway
+
+//    @Transient // This field is only used temporarily during booking, not stored in DB
+//    private String stripeToken;
+//
+//    public String getStripeToken() {
+//        return stripeToken;
+//    }
+//
+//    public void setStripeToken(String stripeToken) {
+//        this.stripeToken = stripeToken;
+//    }
 
 
     //    @Column(name = "check_in_date", nullable = false)

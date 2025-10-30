@@ -30,4 +30,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             // I can also supply the id here But we will supply object
             @Param("user") AppUser user
     );
+
+    // for calculating average rating by different users
+ @Query("SELECT AVG(r.rating) FROM Review r WHERE r.property.id = :propertyId")
+ Double calculateAverageRating(@Param("propertyId") long propertyId);
+
 }
